@@ -12,11 +12,27 @@ import com.xiangsy.demo.geo.bean.CityBean;
 
 @Service
 public interface GeoService {
-    public void preLoadCountiesAndCities();
+    /**
+     * load all provinces and cities after app started
+     */
+    public void preLoadProvincesAndCities();
 
-    public void loadProvinces();
 
+    /**
+     * get city from cache
+     * 
+     * @param provinceName
+     * @param cityName
+     * @return
+     */
     public CityBean getCity(String provinceName, String cityName);
 
+    /**
+     * request remote api to get county code by city and province
+     * 
+     * @param city
+     * @param countyName
+     * @return
+     */
     public String getCountyCode(CityBean city, String countyName);
 }

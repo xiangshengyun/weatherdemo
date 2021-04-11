@@ -11,14 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.alibaba.fastjson.JSON;
-import com.xiangsy.demo.common.DemoExceptionKeys;
 import com.xiangsy.demo.common.DemoCache;
 import com.xiangsy.demo.common.DemoConstants;
+import com.xiangsy.demo.common.DemoExceptionKeys;
 import com.xiangsy.demo.geo.bean.CityBean;
 import com.xiangsy.demo.geo.bean.ProvinceBean;
 import com.xiangsy.demo.geo.service.GeoService;
@@ -44,14 +43,13 @@ public class GeoServiceImpl implements GeoService {
     private String geoCountyUrl;
 
     @Override
-    @Async
-    public void preLoadCountiesAndCities() {
+//    @Async
+    public void preLoadProvincesAndCities() {
         loadProvinces();
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public void loadProvinces() {
+    private void loadProvinces() {
         long startTime = System.currentTimeMillis();
         ResponseEntity<String> responsEntity = restTemplate.exchange(geoProvinceUrl, HttpMethod.GET, null,
                 String.class);
@@ -98,6 +96,10 @@ public class GeoServiceImpl implements GeoService {
 
     @Override
     public CityBean getCity(String provinceName, String cityName) {
+        if (null == DemoCache.provinceNameBeanMap || CollectionUtils.isEmpty(DemoCache.provinceNameBeanMap.keySet())) {
+            loadProvinces();
+        }
+
         ProvinceBean province = DemoCache.provinceNameBeanMap.get(provinceName);
         if (null == province) {
             throw new BizException(DemoExceptionKeys.GEO_PROVINCE_NAME_INVALID, provinceName);
@@ -117,7 +119,8 @@ public class GeoServiceImpl implements GeoService {
     @Override
     @SuppressWarnings("unchecked")
     public String getCountyCode(CityBean city, String countyName) {
-        String geoCountyUrlTmp = geoCountyUrl.replace(DemoConstants.PH_CITY_CODE, city.getProvinceCode() + city.getCode());
+        String geoCountyUrlTmp = geoCountyUrl.replace(DemoConstants.PH_CITY_CODE,
+                city.getProvinceCode() + city.getCode());
         ResponseEntity<String> responsEntity = restTemplate.exchange(geoCountyUrlTmp, HttpMethod.GET, null,
                 String.class);
         if (null != responsEntity) {

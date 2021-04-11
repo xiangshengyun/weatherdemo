@@ -2,6 +2,7 @@ package com.xiangsy.demo.weather.service.impl;
 
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
@@ -16,8 +17,11 @@ import org.springframework.web.client.RestTemplate;
 
 import com.alibaba.fastjson.JSON;
 import com.xiangsy.demo.common.DemoConstants;
+import com.xiangsy.demo.common.DemoExceptionKeys;
 import com.xiangsy.demo.geo.bean.CityBean;
 import com.xiangsy.demo.geo.service.GeoService;
+import com.xiangsy.demo.infrastructure.annotation.CallLimit;
+import com.xiangsy.demo.infrastructure.exception.BizException;
 import com.xiangsy.demo.weather.bean.WeatherInfo;
 import com.xiangsy.demo.weather.bean.WeatherResult;
 import com.xiangsy.demo.weather.service.WeatherService;
@@ -41,8 +45,11 @@ public class WeatherServiceImpl implements WeatherService {
     @Value("${url.weather.county}")
     private String weatherUrl;
 
+    @CallLimit()
     @Override
     public Optional<Float> getTemperature(String province, String city, String county) {
+        validateParams(province, city, county);
+
         log.debug(Thread.currentThread().getName() + ", getTemperature() execution start.");
         // get city from cache
         CityBean cityBean = geoService.getCity(province, city);
@@ -50,6 +57,18 @@ public class WeatherServiceImpl implements WeatherService {
         String countyCode = geoService.getCountyCode(cityBean, county);
 
         return getTemperature(countyCode);
+    }
+
+    private void validateParams(String province, String city, String county) {
+        if (StringUtils.isBlank(province) || StringUtils.length(province) > DemoConstants.PROVINCE_MAX_LENGTH) {
+            throw new BizException(DemoExceptionKeys.GEO_PROVINCE_LENGTH_INVALID, province);
+        }
+        if (StringUtils.isBlank(city) || StringUtils.length(city) > DemoConstants.CITY_MAX_LENGTH) {
+            throw new BizException(DemoExceptionKeys.GEO_CITY_LENGTH_INVALID, city);
+        }
+        if (StringUtils.isBlank(county) || StringUtils.length(county) > DemoConstants.COUNTY_MAX_LENGTH) {
+            throw new BizException(DemoExceptionKeys.GEO_COUNTY_LENGTH_INVALID, county);
+        }
     }
 
     private Optional<Float> getTemperature(String countyCode) {

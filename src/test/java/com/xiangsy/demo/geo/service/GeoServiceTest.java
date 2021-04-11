@@ -2,10 +2,10 @@ package com.xiangsy.demo.geo.service;
 
 import static org.junit.Assert.assertTrue;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.apache.commons.collections.CollectionUtils;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -24,20 +24,17 @@ import com.xiangsy.demo.common.DemoCache;
 @ControllerAdvice("com.xiangsy.demo")
 @ActiveProfiles("dev")
 class GeoServiceTest {
-    @Autowired
-    private GeoService geoService;
-
-    @BeforeEach
+    @Before
     void setUp() throws Exception {
-        // sleep 2s for application load province and cities
-        Thread.sleep(2000);
+        // sleep 3s for application load province and cities
+        // Thread.sleep(3000);
     }
 
     @Test
     void testGetProvinces() {
-        geoService.loadProvinces();
-        assertTrue(null != DemoCache.provinceNameBeanMap && null != DemoCache.provinceNameBeanMap.keySet()
-                && DemoCache.provinceNameBeanMap.keySet().size() == 34);
+        assertTrue(null != DemoCache.provinceNameBeanMap
+                || CollectionUtils.isNotEmpty(DemoCache.provinceNameBeanMap.keySet())
+                        && DemoCache.provinceNameBeanMap.keySet().size() == 34);
     }
 
 }

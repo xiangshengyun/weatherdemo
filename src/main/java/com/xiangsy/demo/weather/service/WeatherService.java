@@ -11,6 +11,7 @@ public interface WeatherService {
 
     /**
      * fetch and return the temperature of one certain county in China
+     * 
      * @param province
      * @param city
      * @param county

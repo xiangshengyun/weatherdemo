@@ -34,7 +34,7 @@ public class DemoAppListener implements ApplicationListener<ApplicationEvent> {
     }
 
     private void initCache() {
-        geoService.preLoadCountiesAndCities();
+        geoService.preLoadProvincesAndCities();
     }
 
 }
