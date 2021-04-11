@@ -17,6 +17,4 @@ import java.lang.annotation.Target;
 @Documented
 public @interface CallLimit {
     String value() default "";
-
-    int limit() default 1;
 }

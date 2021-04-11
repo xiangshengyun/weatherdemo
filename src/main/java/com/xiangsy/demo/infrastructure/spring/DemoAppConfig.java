@@ -30,8 +30,8 @@ public class DemoAppConfig {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         int connectTimeOut = Integer.parseInt(environment.getProperty("http.connect.timeout"));
         int readTimeOut = Integer.parseInt(environment.getProperty("http.read.timeout"));
-        factory.setConnectTimeout(connectTimeOut * 1000);
-        factory.setReadTimeout(readTimeOut * 1000);
+        factory.setConnectTimeout(connectTimeOut);
+        factory.setReadTimeout(readTimeOut);
         return factory;
     }
 
